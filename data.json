@@ -1,0 +1,665 @@
+{
+  "dashboards": {
+    "Distribution": {
+      "Policy Operations": [
+        {
+          "id": "mock-dashboard-001",
+          "name": "Sample Dashboard 001",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/001"
+        },
+        {
+          "id": "mock-dashboard-002",
+          "name": "Sample Dashboard 002",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/002"
+        }
+      ],
+      "Select Broker Reporting": [
+        {
+          "id": "mock-dashboard-003",
+          "name": "Sample Dashboard 003",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/003"
+        }
+      ],
+      "GSI Select Broker Reporting": [
+        {
+          "id": "mock-dashboard-004",
+          "name": "Sample Dashboard 004",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/004"
+        }
+      ],
+      "Production Reporting": [
+        {
+          "id": "mock-dashboard-005",
+          "name": "Sample Dashboard 005",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/005"
+        },
+        {
+          "id": "mock-dashboard-006",
+          "name": "Sample Dashboard 006",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/006"
+        }
+      ]
+    },
+    "Underwriting": {
+      "Portfolio Management": [
+        {
+          "id": "mock-dashboard-007",
+          "name": "Sample Dashboard 007",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/007"
+        },
+        {
+          "id": "mock-dashboard-008",
+          "name": "Sample Dashboard 008",
+          "status": "coming_soon",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/008"
+        },
+        {
+          "id": "mock-dashboard-009",
+          "name": "Sample Dashboard 009",
+          "status": "coming_soon",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/009"
+        },
+        {
+          "id": "mock-dashboard-010",
+          "name": "Sample Dashboard 010",
+          "status": "coming_soon",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/010"
+        }
+      ],
+      "Claims": [
+        {
+          "id": "mock-dashboard-011",
+          "name": "Sample Dashboard 011",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/011"
+        },
+        {
+          "id": "mock-dashboard-012",
+          "name": "Sample Dashboard 012",
+          "status": "coming_soon",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/012"
+        }
+      ],
+      "Actuarial": [
+        {
+          "id": "mock-dashboard-013",
+          "name": "Sample Dashboard 013",
+          "status": "coming_soon",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/013"
+        },
+        {
+          "id": "mock-dashboard-014",
+          "name": "Sample Dashboard 014",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/014"
+        },
+        {
+          "id": "mock-dashboard-015",
+          "name": "Sample Dashboard 015",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/015"
+        },
+        {
+          "id": "mock-dashboard-016",
+          "name": "Sample Dashboard 016",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/016"
+        },
+        {
+          "id": "mock-dashboard-017",
+          "name": "Sample Dashboard 017",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/017"
+        },
+        {
+          "id": "mock-dashboard-018",
+          "name": "Sample Dashboard 018",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/018"
+        },
+        {
+          "id": "mock-dashboard-019",
+          "name": "Sample Dashboard 019",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/019"
+        }
+      ],
+      "UW Operations": [
+        {
+          "id": "mock-dashboard-020",
+          "name": "Sample Dashboard 020",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/020"
+        },
+        {
+          "id": "mock-dashboard-021",
+          "name": "Sample Dashboard 021",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/021"
+        },
+        {
+          "id": "mock-dashboard-022",
+          "name": "Sample Dashboard 022",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/022"
+        },
+        {
+          "id": "mock-dashboard-023",
+          "name": "Sample Dashboard 023",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/023"
+        },
+        {
+          "id": "mock-dashboard-024",
+          "name": "Sample Dashboard 024",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/024"
+        }
+      ],
+      "Miscellaneous Reports": [
+        {
+          "id": "mock-dashboard-025",
+          "name": "Sample Dashboard 025",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/025"
+        },
+        {
+          "id": "mock-dashboard-026",
+          "name": "Sample Dashboard 026",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/026"
+        }
+      ]
+    },
+    "Operations": {
+      "Policy Operations": [
+        {
+          "id": "mock-dashboard-027",
+          "name": "Sample Dashboard 027",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/027"
+        }
+      ],
+      "Service Delivery": [
+        {
+          "id": "mock-dashboard-028",
+          "name": "Sample Dashboard 028",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/028"
+        },
+        {
+          "id": "mock-dashboard-029",
+          "name": "Sample Dashboard 029",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/029"
+        },
+        {
+          "id": "mock-dashboard-030",
+          "name": "Sample Dashboard 030",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/030"
+        }
+      ],
+      "Production Reporting": [
+        {
+          "id": "mock-dashboard-031",
+          "name": "Sample Dashboard 031",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/031"
+        },
+        {
+          "id": "mock-dashboard-032",
+          "name": "Sample Dashboard 032",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/032"
+        }
+      ],
+      "Product Development": [
+        {
+          "id": "mock-dashboard-033",
+          "name": "Sample Dashboard 033",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/033"
+        }
+      ],
+      "Portfolio Management": [
+        {
+          "id": "mock-dashboard-034",
+          "name": "Sample Dashboard 034",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/034"
+        }
+      ]
+    },
+    "Finance": {
+      "Profitability & Margin": [
+        {
+          "id": "mock-dashboard-035",
+          "name": "Sample Dashboard 035",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/035"
+        },
+        {
+          "id": "mock-dashboard-036",
+          "name": "Sample Dashboard 036",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/036"
+        },
+        {
+          "id": "mock-dashboard-037",
+          "name": "Sample Dashboard 037",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/037"
+        }
+      ],
+      "Planning": [
+        {
+          "id": "mock-dashboard-038",
+          "name": "Sample Dashboard 038",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/038"
+        }
+      ],
+      "Operations": [
+        {
+          "id": "mock-dashboard-039",
+          "name": "Sample Dashboard 039",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/039"
+        }
+      ],
+      "ESG Sustainability": [
+        {
+          "id": "mock-dashboard-040",
+          "name": "Sample Dashboard 040",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/040"
+        },
+        {
+          "id": "mock-dashboard-041",
+          "name": "Sample Dashboard 041",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/041"
+        },
+        {
+          "id": "mock-dashboard-042",
+          "name": "Sample Dashboard 042",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/042"
+        }
+      ],
+      "GSI Leadership": [
+        {
+          "id": "mock-dashboard-043",
+          "name": "Sample Dashboard 043",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/043"
+        }
+      ]
+    },
+    "Claims": {
+      "Performance & Productivity": [
+        {
+          "id": "mock-dashboard-044",
+          "name": "Sample Dashboard 044",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/044"
+        },
+        {
+          "id": "mock-dashboard-045",
+          "name": "Sample Dashboard 045",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/045"
+        },
+        {
+          "id": "mock-dashboard-046",
+          "name": "Sample Dashboard 046",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/046"
+        },
+        {
+          "id": "mock-dashboard-047",
+          "name": "Sample Dashboard 047",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/047"
+        },
+        {
+          "id": "mock-dashboard-048",
+          "name": "Sample Dashboard 048",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/048"
+        },
+        {
+          "id": "mock-dashboard-049",
+          "name": "Sample Dashboard 049",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/049"
+        },
+        {
+          "id": "mock-dashboard-050",
+          "name": "Sample Dashboard 050",
+          "status": "coming_soon",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/050"
+        }
+      ],
+      "Capacity and Forecasting": [
+        {
+          "id": "mock-dashboard-051",
+          "name": "Sample Dashboard 051",
+          "status": "coming_soon",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/051"
+        },
+        {
+          "id": "mock-dashboard-052",
+          "name": "Sample Dashboard 052",
+          "status": "coming_soon",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/052"
+        }
+      ],
+      "Claims Financial": [
+        {
+          "id": "mock-dashboard-053",
+          "name": "Sample Dashboard 053",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/053"
+        },
+        {
+          "id": "mock-dashboard-054",
+          "name": "Sample Dashboard 054",
+          "status": "coming_soon",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/054"
+        }
+      ],
+      "Claims Operations": [
+        {
+          "id": "mock-dashboard-055",
+          "name": "Sample Dashboard 055",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/055"
+        },
+        {
+          "id": "mock-dashboard-056",
+          "name": "Sample Dashboard 056",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/056"
+        },
+        {
+          "id": "mock-dashboard-057",
+          "name": "Sample Dashboard 057",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/057"
+        },
+        {
+          "id": "mock-dashboard-058",
+          "name": "Sample Dashboard 058",
+          "status": "coming_soon",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/058"
+        }
+      ],
+      "Support Reports": [
+        {
+          "id": "mock-dashboard-059",
+          "name": "Sample Dashboard 059",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/059"
+        },
+        {
+          "id": "mock-dashboard-060",
+          "name": "Sample Dashboard 060",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/060"
+        },
+        {
+          "id": "mock-dashboard-061",
+          "name": "Sample Dashboard 061",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/061"
+        }
+      ]
+    },
+    "Executive": {
+      "Relationship & Channel": [
+        {
+          "id": "mock-dashboard-062",
+          "name": "Sample Dashboard 062",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/062"
+        },
+        {
+          "id": "mock-dashboard-063",
+          "name": "Sample Dashboard 063",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/063"
+        },
+        {
+          "id": "mock-dashboard-064",
+          "name": "Sample Dashboard 064",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/064"
+        }
+      ],
+      "Portfolio & Performance": [
+        {
+          "id": "mock-dashboard-065",
+          "name": "Sample Dashboard 065",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/065"
+        },
+        {
+          "id": "mock-dashboard-066",
+          "name": "Sample Dashboard 066",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/066"
+        },
+        {
+          "id": "mock-dashboard-067",
+          "name": "Sample Dashboard 067",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/067"
+        },
+        {
+          "id": "mock-dashboard-068",
+          "name": "Sample Dashboard 068",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/068"
+        },
+        {
+          "id": "mock-dashboard-069",
+          "name": "Sample Dashboard 069",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/069"
+        }
+      ],
+      "Efficiency & Execution": [
+        {
+          "id": "mock-dashboard-070",
+          "name": "Sample Dashboard 070",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/070"
+        },
+        {
+          "id": "mock-dashboard-071",
+          "name": "Sample Dashboard 071",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/071"
+        },
+        {
+          "id": "mock-dashboard-072",
+          "name": "Sample Dashboard 072",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/072"
+        }
+      ],
+      "Profitability & Margin": [
+        {
+          "id": "mock-dashboard-073",
+          "name": "Sample Dashboard 073",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/073"
+        },
+        {
+          "id": "mock-dashboard-074",
+          "name": "Sample Dashboard 074",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/074"
+        },
+        {
+          "id": "mock-dashboard-075",
+          "name": "Sample Dashboard 075",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/075"
+        }
+      ],
+      "Risk & Severity": [
+        {
+          "id": "mock-dashboard-076",
+          "name": "Sample Dashboard 076",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/076"
+        },
+        {
+          "id": "mock-dashboard-077",
+          "name": "Sample Dashboard 077",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/077"
+        }
+      ]
+    },
+    "GSI": {
+      "Leadership": [
+        {
+          "id": "mock-dashboard-078",
+          "name": "Sample Dashboard 078",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/078"
+        }
+      ],
+      "Claims": [
+        {
+          "id": "mock-dashboard-079",
+          "name": "Sample Dashboard 079",
+          "status": "coming_soon",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/079"
+        }
+      ],
+      "ESG Sustainability": [
+        {
+          "id": "mock-dashboard-080",
+          "name": "Sample Dashboard 080",
+          "status": "live",
+          "description": "Test dashboard designed for prototyping search, status labels, links, and responsive layouts.",
+          "hyperlink": "https://example.com/mock-dashboards/080"
+        },
+        {
+          "id": "mock-dashboard-081",
+          "name": "Sample Dashboard 081",
+          "status": "live",
+          "description": "Synthetic dashboard for testing filters, cards, charts, and navigation using fictional data only.",
+          "hyperlink": "https://example.com/mock-dashboards/081"
+        },
+        {
+          "id": "mock-dashboard-082",
+          "name": "Sample Dashboard 082",
+          "status": "live",
+          "description": "Mock report containing sample operational metrics, trends, and category breakdowns for development use.",
+          "hyperlink": "https://example.com/mock-dashboards/082"
+        }
+      ],
+      "Distribution": [
+        {
+          "id": "mock-dashboard-083",
+          "name": "Sample Dashboard 083",
+          "status": "live",
+          "description": "Demonstration dashboard with fabricated performance indicators and placeholder business dimensions.",
+          "hyperlink": "https://example.com/mock-dashboards/083"
+        }
+      ]
+    }
+  }
+}

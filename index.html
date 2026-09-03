@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Search</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="state-home">
+
+<header class="topbar">
+  <a class="brand" href="#" id="brandHome">Dashboard<b>Search</b></a>
+  <div class="topbar-inner" id="topbarSearchSlot"></div>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <h1 class="hero-title">Dashboard<b>Search</b></h1>
+    <p class="hero-sub" id="heroSub"></p>
+  </section>
+
+  <!-- the search field lives here on the home screen, and moves into the topbar after a search -->
+  <div class="searchbox-host" id="searchboxHost">
+    <form class="searchbox" id="searchForm" role="search" autocomplete="off">
+      <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21"/>
+      </svg>
+      <input id="q" type="search" name="q" placeholder="Search dashboards"
+             aria-label="Search dashboards" aria-autocomplete="list" aria-controls="suggestions"
+             spellcheck="false" disabled>
+      <button type="button" class="sb-clear" id="clearBtn" aria-label="Clear search" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <button type="submit" class="sb-submit">Search</button>
+      <ul class="suggestions" id="suggestions" role="listbox" hidden></ul>
+    </form>
+    <div class="chips" id="heroChips"></div>
+  </div>
+
+  <section class="results-area" id="resultsArea" hidden>
+    <div class="toolbar">
+      <p class="stats" id="stats"></p>
+      <div class="filters" id="filters">
+        <div class="filter-group" id="divisionFilters" role="group" aria-label="Filter by division"></div>
+        <div class="filter-group" id="statusFilters" role="group" aria-label="Filter by status"></div>
+      </div>
+    </div>
+    <ol class="results" id="results"></ol>
+    <div class="empty" id="empty" hidden>
+      <h2>No dashboards found</h2>
+      <p id="emptyMsg"></p>
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
