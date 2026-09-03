@@ -31,7 +31,7 @@ Or open the folder in VS Code and use the **Live Server** extension.
 |---|---|
 | `index.html` | Page skeleton. Two states - home and results - switched by a class on `<body>`. |
 | `styles.css` | All styling, including the light/dark palettes. No framework. |
-| `app.js` | Loading, searching, ranking, rendering, browse, filters, suggestions, stars. ~840 lines. |
+| `app.js` | Loading, searching, ranking, rendering, browse, filters, suggestions, stars. ~860 lines. |
 | `data.json` | The catalogue. The only file you edit to change what is searchable. |
 | `serve.js` | Local preview server. Development only - **never deployed**. |
 | `jsconfig.json` | Turns on editor type-checking for `app.js`. Editor only - **never deployed**. |
@@ -72,6 +72,25 @@ used for fast rejection while scoring.
 
 `status` is either `live` or `coming_soon`; anything else renders with its raw
 value as the label.
+
+**`coming_soon` records are not linked.** Every record in this catalogue carries
+a `hyperlink` whatever its status, and the coming-soon ones point at the same
+generated URL shape as the live ones - so they are placeholders, not preview
+pages, and offering them as links would send people somewhere that is not there
+yet. Those rows render the name as plain text with no host label; the amber
+"Coming soon" marker is the explanation, and they can still be starred so they
+are waiting for you when they land. Everything else - matching, ranking,
+filtering, browsing - treats them exactly like live records.
+
+The decision is one line in `app.js`:
+
+```js
+const LINK_COMING_SOON = false;
+```
+
+Set it to `true` if `coming_soon` entries start pointing at something real, a
+preview or a spec page. `linkFor()` is the only place that reads it, and both
+the result rows and the starred cards go through it.
 
 **To change what is searchable, edit `data.json` and reload.** Adding a
 dashboard, a category or a whole division needs no code change - the browse
@@ -280,7 +299,8 @@ outside the VPN.
 ### Pre-deployment checklist
 
 - [ ] `data.json` contains only information the audience is allowed to see
-- [ ] Every `hyperlink` is reachable from where users will open the page
+- [ ] Every `live` `hyperlink` is reachable from where users will open the page
+- [ ] `coming_soon` links are placeholders, or `LINK_COMING_SOON` is turned on
 - [ ] Access control matches the sensitivity of the data (see above)
 - [ ] Optionally, a CSP header:
       `default-src 'self'; script-src 'self'; style-src 'self'`

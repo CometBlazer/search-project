@@ -50,6 +50,23 @@ const starredCount = el('starredN');
 /** @type {Record<string, string>} */
 const STATUS_LABEL = { live: 'Live', coming_soon: 'Coming soon' };
 
+/**
+ * Whether a `coming_soon` dashboard's `hyperlink` is a place you can actually
+ * go. It is not in this catalogue - every record carries the same generated
+ * URL whatever its status - so those titles render as plain text and the host
+ * label is left off, rather than offering a link that leads nowhere.
+ *
+ * Set this to true if `coming_soon` entries start pointing at something real,
+ * a preview or a spec page; nothing else needs to change.
+ */
+const LINK_COMING_SOON = false;
+
+/** @param {Dashboard} item @returns {string} the url to link to, '' for none */
+function linkFor(item) {
+  if (item.status === 'coming_soon' && !LINK_COMING_SOON) return '';
+  return safeUrl(item.hyperlink);
+}
+
 /** @type {Dashboard[]} */
 let ITEMS = [];
 /** @type {Set<string>} */
@@ -402,7 +419,7 @@ function renderResults(query) {
 
 /** @param {Dashboard} item @param {string[]} tokens @returns {string} html */
 function card(item, tokens) {
-  const href = safeUrl(item.hyperlink);
+  const href = linkFor(item);
   const host = safeHost(href);
   const title = highlight(item.name, tokens);
   return `
@@ -741,7 +758,7 @@ function renderStarred() {
 
 /** @param {Dashboard} item @returns {string} html */
 function starCard(item) {
-  const href = safeUrl(item.hyperlink);
+  const href = linkFor(item);
   const name = escapeHtml(item.name);
   return `
   <div class="star-card">
