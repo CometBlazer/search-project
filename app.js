@@ -1,30 +1,67 @@
+// @ts-check
 /* Dashboard Search - client-side search over data.json */
 
-const el = (id) => document.getElementById(id);
-const form = el('searchForm');
-const input = el('q');
-const clearBtn = el('clearBtn');
-const suggestBox = el('suggestions');
+/**
+ * One dashboard, flattened out of the division/category nesting in data.json.
+ * @typedef {Object} Dashboard
+ * @property {string} id
+ * @property {string} name
+ * @property {string} description
+ * @property {string} hyperlink
+ * @property {'live'|'coming_soon'} status
+ * @property {string} division
+ * @property {string} category
+ * @property {string} haystack   all of the above lowercased, for cheap matching
+ */
+
+/**
+ * A dashboard together with its relevance score for the current query.
+ * @typedef {{ item: Dashboard, score: number }} Hit
+ */
+
+/**
+ * A row in the suggestion dropdown.
+ * @typedef {{ text: string, meta: string }} Suggestion
+ */
+
+/** @param {string} id @returns {HTMLElement} */
+const el = (id) => /** @type {HTMLElement} */ (document.getElementById(id));
+
+const form = /** @type {HTMLFormElement} */ (el('searchForm'));
+const input = /** @type {HTMLInputElement} */ (el('q'));
+const clearBtn = /** @type {HTMLButtonElement} */ (el('clearBtn'));
+const suggestBox = /** @type {HTMLUListElement} */ (el('suggestions'));
 const resultsArea = el('resultsArea');
 const resultsList = el('results');
 const statsEl = el('stats');
 const emptyEl = el('empty');
+const emptyTitle = /** @type {HTMLElement} */ (emptyEl.querySelector('h2'));
 const emptyMsg = el('emptyMsg');
 const divisionFilters = el('divisionFilters');
 const statusFilters = el('statusFilters');
 
+/** @type {Record<string, string>} */
 const STATUS_LABEL = { live: 'Live', coming_soon: 'Coming soon' };
 
-let ITEMS = [];              // flattened dashboards
+/** @type {Dashboard[]} */
+let ITEMS = [];
+/** @type {Set<string>} */
 let activeDivisions = new Set();
+/** @type {Set<string>} */
 let activeStatuses = new Set();
-let lastMatches = [];        // matches for the current query, before filters
+/** @type {Hit[]} matches for the current query, before filters */
+let lastMatches = [];
 let suggestIndex = -1;
 let isPartial = false;      // true when results only match some of the terms
 
 /* ---------- data ---------- */
 
+/**
+ * @param {any} json  parsed data.json - untyped on purpose, it comes off the wire
+ * @returns {Dashboard[]}
+ */
 function flatten(json) {
+  /** @type {Dashboard[]} */
   const out = [];
   const groups = (json && json.dashboards) || {};
   for (const [division, categories] of Object.entries(groups)) {
@@ -69,12 +106,13 @@ async function load() {
   }
 }
 
+/** @param {any} err */
 function showLoadError(err) {
   document.body.className = 'state-results';
   resultsArea.hidden = false;
   resultsList.innerHTML = '';
   emptyEl.hidden = false;
-  emptyEl.querySelector('h2').textContent = 'Could not load data.json';
+  emptyTitle.textContent = 'Could not load data.json';
   emptyMsg.innerHTML =
     'Browsers block <code>fetch()</code> on <code>file://</code> pages. ' +
     'Serve this folder over HTTP, e.g. run <code>python -m http.server 8000</code> ' +
@@ -84,9 +122,18 @@ function showLoadError(err) {
 
 /* ---------- search ---------- */
 
+/** @param {string} s @returns {string[]} */
 const tokenize = (s) => s.toLowerCase().split(/[^a-z0-9]+/i).filter(Boolean);
 
-// Score one item against the query tokens. Every token must appear somewhere.
+/**
+ * Score one item against the query tokens. Every token must appear somewhere,
+ * unless requireAll is false (the partial-match fallback).
+ * @param {Dashboard} item
+ * @param {string[]} tokens
+ * @param {string} rawQuery
+ * @param {boolean} [requireAll]
+ * @returns {number} 0 means no match
+ */
 function scoreItem(item, tokens, rawQuery, requireAll = true) {
   let score = 0;
   let matched = 0;
@@ -129,15 +176,22 @@ function scoreItem(item, tokens, rawQuery, requireAll = true) {
   return score;
 }
 
+/** @param {string} text @param {string} token @returns {boolean} */
 function wordStart(text, token) {
   const i = text.indexOf(token);
   if (i < 0) return false;
   return i === 0 || /[^a-z0-9]/i.test(text[i - 1]);
 }
 
+/**
+ * @param {string} query
+ * @param {boolean} [requireAll]
+ * @returns {Hit[]} best match first
+ */
 function search(query, requireAll = true) {
   const tokens = tokenize(query);
   if (!tokens.length) return [];
+  /** @type {Hit[]} */
   const hits = [];
   for (const item of ITEMS) {
     const score = scoreItem(item, tokens, query, requireAll);
@@ -149,11 +203,14 @@ function search(query, requireAll = true) {
 
 /* ---------- highlighting ---------- */
 
+/** @param {string} s @returns {string} */
 const escapeHtml = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+/** @param {string} s @returns {string} */
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/** @param {string} text @param {string[]} tokens @returns {string} html */
 function highlight(text, tokens) {
   const safe = escapeHtml(text);
   if (!tokens.length) return safe;
@@ -163,6 +220,7 @@ function highlight(text, tokens) {
 
 /* ---------- rendering ---------- */
 
+/** @param {string} query @param {boolean} [pushUrl] */
 function runSearch(query, pushUrl = true) {
   const q = query.trim();
   if (!q) return goHome();
@@ -183,6 +241,7 @@ function runSearch(query, pushUrl = true) {
 
   // drop filters that no longer apply to this result set
   const divs = new Set(lastMatches.map((m) => m.item.division));
+  /** @type {Set<string>} */
   const stats = new Set(lastMatches.map((m) => m.item.status));
   activeDivisions = new Set([...activeDivisions].filter((d) => divs.has(d)));
   activeStatuses = new Set([...activeStatuses].filter((s) => stats.has(s)));
@@ -204,6 +263,7 @@ function visibleMatches() {
   );
 }
 
+/** @param {string} query */
 function renderResults(query) {
   const tokens = tokenize(query);
   const shown = visibleMatches();
@@ -220,13 +280,14 @@ function renderResults(query) {
   const noResults = shown.length === 0;
   emptyEl.hidden = !noResults;
   if (noResults) {
-    emptyEl.querySelector('h2').textContent = 'No dashboards found';
+    emptyTitle.textContent = 'No dashboards found';
     emptyMsg.textContent = lastMatches.length
       ? 'Your filters hid all ' + lastMatches.length + ' matches. Try clearing a filter.'
       : 'Nothing matched "' + query + '". Check the spelling or try a broader term.';
   }
 }
 
+/** @param {Dashboard} item @param {string[]} tokens @returns {string} html */
 function card(item, tokens) {
   const href = safeUrl(item.hyperlink);
   const host = safeHost(href);
@@ -244,6 +305,7 @@ function card(item, tokens) {
   </li>`;
 }
 
+/** @param {string} url @returns {string} an http(s) url, or '' if it is neither */
 function safeUrl(url) {
   try {
     const u = new URL(url, location.href);
@@ -251,6 +313,7 @@ function safeUrl(url) {
   } catch { return ''; }
 }
 
+/** @param {string} url @returns {string} */
 function safeHost(url) {
   try { return new URL(url).hostname.replace(/^www\./, ''); }
   catch { return ''; }
@@ -259,7 +322,9 @@ function safeHost(url) {
 /* ---------- filters ---------- */
 
 function renderFilters() {
+  /** @type {Map<string, number>} */
   const byDivision = new Map();
+  /** @type {Map<string, number>} */
   const byStatus = new Map();
   for (const { item } of lastMatches) {
     byDivision.set(item.division, (byDivision.get(item.division) || 0) + 1);
@@ -277,16 +342,25 @@ function renderFilters() {
     .join('');
 }
 
+/**
+ * @param {string} kind
+ * @param {string} value
+ * @param {string} label
+ * @param {number} count
+ * @param {boolean} on
+ * @returns {string} html
+ */
 function pill(kind, value, label, count, on) {
   return `<button type="button" class="pill" data-kind="${kind}" data-value="${escapeHtml(value)}"
     aria-pressed="${on}">${escapeHtml(label)}<span class="pill-n">${count}</span></button>`;
 }
 
 el('filters').addEventListener('click', (e) => {
-  const btn = e.target.closest('.pill');
-  if (!btn) return;
+  const btn = e.target instanceof Element ? e.target.closest('.pill') : null;
+  if (!(btn instanceof HTMLElement)) return;
   const set = btn.dataset.kind === 'division' ? activeDivisions : activeStatuses;
   const value = btn.dataset.value;
+  if (!value) return;
   set.has(value) ? set.delete(value) : set.add(value);
   renderFilters();
   renderResults(input.value.trim());
@@ -294,10 +368,13 @@ el('filters').addEventListener('click', (e) => {
 
 /* ---------- suggestions ---------- */
 
+/** @param {string} query @returns {Suggestion[]} */
 function buildSuggestions(query) {
   const tokens = tokenize(query);
   if (!tokens.length) return [];
+  /** @type {Set<string>} */
   const seen = new Set();
+  /** @type {Suggestion[]} */
   const out = [];
 
   // matching categories and divisions first, then the top dashboards
@@ -319,12 +396,15 @@ function buildSuggestions(query) {
   return out.slice(0, 8);
 }
 
+/** @type {{ q: string|null, hits: Hit[] }} */
 let previewCache = { q: null, hits: [] };
+/** @param {string} query @returns {Hit[]} */
 function lastPreview(query) {
   if (previewCache.q !== query) previewCache = { q: query, hits: search(query).slice(0, 12) };
   return previewCache.hits;
 }
 
+/** @param {string} query */
 function showSuggestions(query) {
   const items = buildSuggestions(query);
   suggestIndex = -1;
@@ -347,6 +427,7 @@ function hideSuggestions() {
   suggestIndex = -1;
 }
 
+/** @param {number} step +1 for down, -1 for up */
 function moveSuggestion(step) {
   const options = [...suggestBox.children];
   if (!options.length) return;
@@ -361,8 +442,8 @@ function moveSuggestion(step) {
 }
 
 suggestBox.addEventListener('mousedown', (e) => {
-  const li = e.target.closest('li');
-  if (!li) return;
+  const li = e.target instanceof Element ? e.target.closest('li') : null;
+  if (!(li instanceof HTMLElement) || !li.dataset.value) return;
   e.preventDefault();
   input.value = li.dataset.value;
   runSearch(input.value);
@@ -370,6 +451,7 @@ suggestBox.addEventListener('mousedown', (e) => {
 
 /* ---------- state / events ---------- */
 
+/** @param {boolean} toTopbar */
 function moveSearchBox(toTopbar) {
   const slot = toTopbar ? el('topbarSearchSlot') : el('searchboxHost');
   if (form.parentElement !== slot) slot.insertBefore(form, slot.firstChild);
@@ -397,21 +479,23 @@ function buildChips() {
 }
 
 el('heroChips').addEventListener('click', (e) => {
-  const chip = e.target.closest('.chip');
+  const chip = e.target instanceof Element ? e.target.closest('.chip') : null;
   if (!chip) return;
-  input.value = chip.textContent;
+  input.value = chip.textContent || '';
   runSearch(input.value);
 });
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  if (suggestIndex >= 0 && suggestBox.children[suggestIndex]) {
-    input.value = suggestBox.children[suggestIndex].dataset.value;
+  const picked = suggestIndex >= 0 ? suggestBox.children[suggestIndex] : null;
+  if (picked instanceof HTMLElement && picked.dataset.value) {
+    input.value = picked.dataset.value;
   }
   runSearch(input.value);
   input.blur();
 });
 
+/** @type {ReturnType<typeof setTimeout>|undefined} */
 let debounce;
 input.addEventListener('input', () => {
   const q = input.value;
@@ -445,7 +529,7 @@ input.addEventListener('focus', () => {
 });
 
 document.addEventListener('click', (e) => {
-  if (!form.contains(e.target)) hideSuggestions();
+  if (e.target instanceof Node && !form.contains(e.target)) hideSuggestions();
 });
 
 clearBtn.addEventListener('click', () => {
