@@ -31,7 +31,7 @@ Or open the folder in VS Code and use the **Live Server** extension.
 |---|---|
 | `index.html` | Page skeleton. Two states - home and results - switched by a class on `<body>`. |
 | `styles.css` | All styling, including the light/dark palettes. No framework. |
-| `app.js` | Loading, searching, ranking, rendering, browse, filters, suggestions, stars. ~780 lines. |
+| `app.js` | Loading, searching, ranking, rendering, browse, filters, suggestions, stars. ~840 lines. |
 | `data.json` | The catalogue. The only file you edit to change what is searchable. |
 | `serve.js` | Local preview server. Development only - **never deployed**. |
 | `jsconfig.json` | Turns on editor type-checking for `app.js`. Editor only - **never deployed**. |
@@ -118,8 +118,25 @@ and `https:` URLs - see [Security](#security).
 
 `<body>` carries either `state-home` or `state-results`, and CSS keys off that.
 The search field is a single element that `moveSearchBox()` physically relocates
-between the hero and the top bar, so it keeps its value, focus and event
-listeners across the transition rather than being two separate fields.
+between the hero and the top bar, so it keeps its value and its event listeners
+across the transition rather than being two separate fields.
+
+Re-parenting a focused input detaches it, and a detached input loses focus and
+its caret - which silently swallowed the rest of whatever was being typed when
+the field docked. `moveSearchBox()` records both before the move and restores
+them after, so typing runs straight through the transition.
+
+**Nothing navigates on its own.** Emptying the field - by backspacing, by the
+clear button, or by Escape - does *not* return to the home screen. `showBlank()`
+keeps the docked field, the focus and the caret exactly where they are, clears
+the list, drops `?q=` from the URL and leaves the browse chips and the starred
+grid on screen (`<body>` gains `state-blank`). Going home is an explicit act:
+the brand link, or Escape on an already-empty field.
+
+The field also works before `data.json` arrives. It is never `disabled`; a query
+typed during loading is kept and run as soon as the catalogue lands, and
+`runSearch()`/`runBrowse()` no-op until then, so a failed load keeps its error
+message on screen instead of being overwritten by an empty result list.
 
 ### 5. Filters
 
@@ -186,9 +203,12 @@ either parameter is ignored if it is not in the current data.
 | `/` | Focus the search field from anywhere |
 | Up / Down | Move through suggestions |
 | Enter | Search, accepting a highlighted suggestion |
-| Escape | Close suggestions, then clear the query or leave a browse view |
+| Escape | One step per press: close suggestions, clear the query, go home |
 
-Typing searches live, debounced at 120 ms.
+Typing searches live, debounced at 120 ms. Submitting keeps focus in the field
+on a mouse-and-keyboard machine, so the query is easy to refine; on a touch
+device it blurs instead, to get the on-screen keyboard out of the way of the
+results.
 
 ---
 

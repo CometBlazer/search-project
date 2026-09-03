@@ -60,6 +60,7 @@ let activeStatuses = new Set();
 let lastMatches = [];
 let suggestIndex = -1;
 let isPartial = false;      // true when results only match some of the terms
+let ready = false;          // false until data.json is in, or if it never arrives
 /** @type {Map<string, Map<string, number>>} division -> category -> how many */
 let TAXONOMY = new Map();
 let browseDivision = '';    // '' when not browsing the taxonomy
@@ -109,13 +110,16 @@ async function load() {
   const divisions = new Set(ITEMS.map((i) => i.division)).size;
   el('heroSub').textContent =
     'Search ' + ITEMS.length + ' dashboards across ' + divisions + ' divisions';
-  input.disabled = false;
+  ready = true;
   input.focus();
   buildTaxonomy();
   loadStars();
   renderChips();
   renderExamples();
   renderStarred();
+
+  // the field is live from the first paint, so run anything typed while loading
+  if (input.value.trim()) return runSearch(input.value);
 
   const params = new URLSearchParams(location.search);
   const initial = params.get('q');
@@ -251,8 +255,10 @@ function highlight(text, tokens) {
 
 /** @param {string} query @param {boolean} [pushUrl] */
 function runSearch(query, pushUrl = true) {
+  if (!ready) return;   // still loading, or the load failed - keep what is on screen
   const q = query.trim();
-  if (!q) return goHome();
+  // an empty field is not a request to go anywhere - stay put and wait
+  if (!q) return document.body.classList.contains('state-results') ? showBlank() : goHome();
 
   // a text search replaces any browse view
   browseDivision = '';
@@ -295,6 +301,7 @@ function runSearch(query, pushUrl = true) {
  * @param {boolean} [pushUrl]
  */
 function runBrowse(pushUrl = true) {
+  if (!ready) return;
   if (!browseDivision) return goHome();
 
   input.value = '';
@@ -324,6 +331,35 @@ function runBrowse(pushUrl = true) {
     history.replaceState(null, '', '?division=' + encodeURIComponent(browseDivision) +
       (browseCategory ? '&category=' + encodeURIComponent(browseCategory) : ''));
   }
+}
+
+/**
+ * The query has been emptied while results were showing. Clear the list but
+ * keep the docked search field, the caret and the scroll position where they
+ * are - leaving for the home screen is the clear button's job, or Escape's.
+ */
+function showBlank() {
+  lastMatches = [];
+  isPartial = false;
+  browseDivision = '';
+  browseCategory = '';
+  activeDivisions.clear();
+  activeStatuses.clear();
+  clearBtn.hidden = true;
+
+  document.body.className = 'state-results browsing state-blank';   // chips and stars stay up
+  resultsArea.hidden = false;
+  renderChips();
+  renderFilters();
+  statsEl.innerHTML = '';
+  resultsList.innerHTML = '';
+  renderStarred();
+  // with a starred grid on screen the page already says what to do next
+  emptyEl.hidden = !starredEl.hidden;
+  emptyTitle.textContent = '';
+  emptyMsg.textContent =
+    'Type to search ' + ITEMS.length + ' dashboards, or pick a division above.';
+  history.replaceState(null, '', location.pathname);
 }
 
 function visibleMatches() {
@@ -529,10 +565,26 @@ suggestBox.addEventListener('mousedown', (e) => {
 
 /* ---------- state / events ---------- */
 
-/** @param {boolean} toTopbar */
+/**
+ * Dock the search field into the topbar, or put it back in the hero.
+ * Re-parenting detaches the field, and a detached input loses focus and its
+ * caret - which would swallow the rest of whatever is being typed - so both
+ * are restored afterwards.
+ * @param {boolean} toTopbar
+ */
 function moveSearchBox(toTopbar) {
   const slot = toTopbar ? el('topbarSearchSlot') : el('searchboxHost');
-  if (form.parentElement !== slot) slot.insertBefore(form, slot.firstChild);
+  if (form.parentElement === slot) return;
+
+  const hadFocus = document.activeElement === input;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  slot.insertBefore(form, slot.firstChild);
+  if (!hadFocus) return;
+  input.focus();
+  if (typeof start === 'number' && typeof end === 'number') {
+    try { input.setSelectionRange(start, end); } catch { /* not all inputs allow it */ }
+  }
 }
 
 function goHome() {
@@ -714,7 +766,10 @@ form.addEventListener('submit', (e) => {
     input.value = picked.dataset.value;
   }
   runSearch(input.value);
-  input.blur();
+  hideSuggestions();
+  // on a touch device the keyboard covers the results; on a desktop, dropping
+  // focus just makes refining the query harder
+  if (window.matchMedia('(hover: none)').matches) input.blur();
 });
 
 /** @type {ReturnType<typeof setTimeout>|undefined} */
@@ -726,7 +781,7 @@ input.addEventListener('input', () => {
   debounce = setTimeout(() => {
     if (!q.trim()) {
       hideSuggestions();
-      if (document.body.classList.contains('state-results')) goHome();
+      if (document.body.classList.contains('state-results')) showBlank();
       return;
     }
     // live results, plus the suggestion dropdown while the field has focus
@@ -741,9 +796,13 @@ input.addEventListener('keydown', (e) => {
     e.preventDefault();
     moveSuggestion(e.key === 'ArrowDown' ? 1 : -1);
   } else if (e.key === 'Escape') {
+    // one step at a time: close the dropdown, then clear the query, then leave
     if (!suggestBox.hidden) hideSuggestions();
-    else if (input.value) { input.value = ''; clearBtn.hidden = true; goHome(); }
-    else if (browseDivision) goHome();
+    else if (input.value) {
+      input.value = '';
+      clearBtn.hidden = true;
+      if (document.body.classList.contains('state-results')) showBlank();
+    } else goHome();
   }
 });
 
@@ -758,7 +817,9 @@ document.addEventListener('click', (e) => {
 clearBtn.addEventListener('click', () => {
   input.value = '';
   clearBtn.hidden = true;
-  goHome();
+  hideSuggestions();
+  if (document.body.classList.contains('state-results')) showBlank();
+  input.focus();   // the point of clearing is to type something else
 });
 
 el('brandHome').addEventListener('click', (e) => {

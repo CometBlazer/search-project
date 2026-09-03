@@ -277,7 +277,9 @@ a { color: inherit; }
 
 /* ---------- starred grid ---------- */
 .starred { display: none; }
-.state-home .starred:not([hidden]) { display: block; max-width: var(--col); margin: 34px auto 0; padding: 0 24px 40px; }
+.state-home .starred:not([hidden]),
+.state-blank .starred:not([hidden]) { display: block; max-width: var(--col); margin: 34px auto 0; padding: 0 24px 40px; }
+.state-blank .starred:not([hidden]) { margin-top: 24px; }
 .starred-head {
   display: flex;
   align-items: baseline;
@@ -436,6 +438,9 @@ mark {
 
 /* ---------- empty state ---------- */
 .empty { padding: 44px 0; color: var(--text-3); }
+/* the blank state is a hint under the chips, not a full empty screen */
+.state-blank .empty { padding: 20px 0 0; }
+.empty h2:empty { display: none; }
 .empty h2 { margin: 0 0 6px; font-size: 15.5px; font-weight: 500; color: var(--text); }
 .empty p { margin: 0; font-size: 13.5px; max-width: 62ch; }
 .empty code {
