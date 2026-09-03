@@ -34,8 +34,19 @@
       <button type="submit" class="sb-submit">Search</button>
       <ul class="suggestions" id="suggestions" role="listbox" hidden></ul>
     </form>
-    <div class="chips" id="heroChips"></div>
+    <!-- browse the catalogue by division, then by category within it -->
+    <div class="browse" id="browse">
+      <div class="chip-row" id="divisionChips" role="group" aria-label="Browse by division"></div>
+      <div class="chip-row chip-row-sub" id="categoryChips" role="group" aria-label="Browse by category" hidden></div>
+    </div>
+    <div class="examples" id="examples"></div>
   </div>
+
+  <!-- starred dashboards, kept in localStorage - home screen only -->
+  <section class="starred" id="starred" hidden>
+    <h2 class="starred-head">Starred<span class="starred-n" id="starredN"></span></h2>
+    <div class="star-grid" id="starGrid"></div>
+  </section>
 
   <section class="results-area" id="resultsArea" hidden>
     <div class="toolbar">

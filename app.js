@@ -39,6 +39,13 @@ const emptyTitle = /** @type {HTMLElement} */ (emptyEl.querySelector('h2'));
 const emptyMsg = el('emptyMsg');
 const divisionFilters = el('divisionFilters');
 const statusFilters = el('statusFilters');
+const browseEl = el('browse');
+const divisionChips = el('divisionChips');
+const categoryChips = el('categoryChips');
+const examplesEl = el('examples');
+const starredEl = el('starred');
+const starGrid = el('starGrid');
+const starredCount = el('starredN');
 
 /** @type {Record<string, string>} */
 const STATUS_LABEL = { live: 'Live', coming_soon: 'Coming soon' };
@@ -53,6 +60,12 @@ let activeStatuses = new Set();
 let lastMatches = [];
 let suggestIndex = -1;
 let isPartial = false;      // true when results only match some of the terms
+/** @type {Map<string, Map<string, number>>} division -> category -> how many */
+let TAXONOMY = new Map();
+let browseDivision = '';    // '' when not browsing the taxonomy
+let browseCategory = '';    // '' means the whole division
+/** @type {Set<string>} ids of starred dashboards, mirrored into localStorage */
+let starred = new Set();
 
 /* ---------- data ---------- */
 
@@ -98,11 +111,27 @@ async function load() {
     'Search ' + ITEMS.length + ' dashboards across ' + divisions + ' divisions';
   input.disabled = false;
   input.focus();
-  buildChips();
-  const initial = new URLSearchParams(location.search).get('q');
+  buildTaxonomy();
+  loadStars();
+  renderChips();
+  renderExamples();
+  renderStarred();
+
+  const params = new URLSearchParams(location.search);
+  const initial = params.get('q');
   if (initial) {
     input.value = initial;
     runSearch(initial);
+    return;
+  }
+  // ?division=...&category=... reopens a browse view
+  const division = params.get('division');
+  const cats = division ? TAXONOMY.get(division) : undefined;
+  if (division && cats) {
+    browseDivision = division;
+    const category = params.get('category');
+    if (category && cats.has(category)) browseCategory = category;
+    runBrowse(false);
   }
 }
 
@@ -225,6 +254,11 @@ function runSearch(query, pushUrl = true) {
   const q = query.trim();
   if (!q) return goHome();
 
+  // a text search replaces any browse view
+  browseDivision = '';
+  browseCategory = '';
+  renderChips();
+
   lastMatches = search(q);
   isPartial = false;
   if (!lastMatches.length && tokenize(q).length > 1) {
@@ -255,6 +289,43 @@ function runSearch(query, pushUrl = true) {
   }
 }
 
+/**
+ * Show every dashboard in the open division, narrowed to one category if a
+ * category chip is on. No query, so nothing is scored or highlighted.
+ * @param {boolean} [pushUrl]
+ */
+function runBrowse(pushUrl = true) {
+  if (!browseDivision) return goHome();
+
+  input.value = '';
+  clearBtn.hidden = true;
+  isPartial = false;
+  lastMatches = ITEMS
+    .filter((i) => i.division === browseDivision && (!browseCategory || i.category === browseCategory))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((item) => ({ item, score: 0 }));
+
+  document.body.className = 'state-results browsing';
+  moveSearchBox(true);
+  resultsArea.hidden = false;
+  hideSuggestions();
+
+  // division is fixed here, so only the status filter still has anything to say
+  /** @type {Set<string>} */
+  const stats = new Set(lastMatches.map((m) => m.item.status));
+  activeDivisions.clear();
+  activeStatuses = new Set([...activeStatuses].filter((s) => stats.has(s)));
+
+  renderChips();
+  renderFilters();
+  renderResults('');
+
+  if (pushUrl) {
+    history.replaceState(null, '', '?division=' + encodeURIComponent(browseDivision) +
+      (browseCategory ? '&category=' + encodeURIComponent(browseCategory) : ''));
+  }
+}
+
 function visibleMatches() {
   return lastMatches.filter(
     ({ item }) =>
@@ -268,10 +339,14 @@ function renderResults(query) {
   const tokens = tokenize(query);
   const shown = visibleMatches();
 
-  statsEl.innerHTML = shown.length
-    ? `<b>${shown.length}</b> result${shown.length === 1 ? '' : 's'} for <b>${escapeHtml(query)}</b>` +
-      (isPartial ? ' &middot; no dashboard matches every term, showing partial matches' : '')
-    : '';
+  const plural = shown.length === 1 ? '' : 's';
+  statsEl.innerHTML = !shown.length
+    ? ''
+    : browseDivision
+      ? `<b>${shown.length}</b> dashboard${plural} in <b>${escapeHtml(browseDivision)}</b>` +
+        (browseCategory ? ' &middot; ' + escapeHtml(browseCategory) : '')
+      : `<b>${shown.length}</b> result${plural} for <b>${escapeHtml(query)}</b>` +
+        (isPartial ? ' &middot; no dashboard matches every term, showing partial matches' : '');
 
   resultsList.innerHTML = shown
     .map(({ item }) => card(item, tokens))
@@ -283,7 +358,9 @@ function renderResults(query) {
     emptyTitle.textContent = 'No dashboards found';
     emptyMsg.textContent = lastMatches.length
       ? 'Your filters hid all ' + lastMatches.length + ' matches. Try clearing a filter.'
-      : 'Nothing matched "' + query + '". Check the spelling or try a broader term.';
+      : browseDivision
+        ? 'This category is empty.'
+        : 'Nothing matched "' + query + '". Check the spelling or try a broader term.';
   }
 }
 
@@ -302,6 +379,7 @@ function card(item, tokens) {
       <span class="row-id">${highlight(item.id, tokens)}</span>
       ${host ? `<span class="row-host">${escapeHtml(host)}</span>` : ''}
     </div>
+    ${starButton(item)}
   </li>`;
 }
 
@@ -331,7 +409,7 @@ function renderFilters() {
     byStatus.set(item.status, (byStatus.get(item.status) || 0) + 1);
   }
 
-  divisionFilters.innerHTML = [...byDivision.entries()]
+  divisionFilters.innerHTML = browseDivision ? '' : [...byDivision.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([name, n]) => pill('division', name, name, n, activeDivisions.has(name)))
     .join('');
@@ -466,23 +544,167 @@ function goHome() {
   lastMatches = [];
   activeDivisions.clear();
   activeStatuses.clear();
+  browseDivision = '';
+  browseCategory = '';
+  renderChips();
+  renderStarred();
   hideSuggestions();
   history.replaceState(null, '', location.pathname);
   input.focus();
 }
 
-function buildChips() {
-  const picks = ['claims', 'ESG', 'portfolio', 'broker', 'profitability', 'forecasting'];
-  el('heroChips').innerHTML = picks
-    .map((p) => `<button type="button" class="chip">${escapeHtml(p)}</button>`)
-    .join('');
+/* ---------- browse chips ---------- */
+
+function buildTaxonomy() {
+  TAXONOMY = new Map();
+  for (const item of ITEMS) {
+    let cats = TAXONOMY.get(item.division);
+    if (!cats) TAXONOMY.set(item.division, (cats = new Map()));
+    cats.set(item.category, (cats.get(item.category) || 0) + 1);
+  }
 }
 
-el('heroChips').addEventListener('click', (e) => {
+/** @param {Map<string, number>} cats @returns {number} */
+const sizeOf = (cats) => [...cats.values()].reduce((a, b) => a + b, 0);
+
+/** Divisions always; the open division's categories underneath it. */
+function renderChips() {
+  divisionChips.innerHTML = [...TAXONOMY.entries()]
+    .sort((a, b) => sizeOf(b[1]) - sizeOf(a[1]) || a[0].localeCompare(b[0]))
+    .map(([name, cats]) => chip('division', name, sizeOf(cats), browseDivision === name))
+    .join('');
+
+  const cats = TAXONOMY.get(browseDivision);
+  if (!cats) {
+    categoryChips.innerHTML = '';
+    categoryChips.hidden = true;
+    return;
+  }
+  categoryChips.innerHTML = [...cats.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name, n]) => chip('category', name, n, browseCategory === name))
+    .join('');
+  categoryChips.hidden = false;
+}
+
+/**
+ * @param {'division'|'category'} kind
+ * @param {string} label
+ * @param {number} count
+ * @param {boolean} on
+ * @returns {string} html
+ */
+function chip(kind, label, count, on) {
+  return `<button type="button" class="chip" data-kind="${kind}" data-value="${escapeHtml(label)}"
+    aria-pressed="${on}">${escapeHtml(label)}<span class="chip-n">${count}</span></button>`;
+}
+
+browseEl.addEventListener('click', (e) => {
+  const btn = e.target instanceof Element ? e.target.closest('.chip') : null;
+  if (!(btn instanceof HTMLElement) || !btn.dataset.value) return;
+  const value = btn.dataset.value;
+  if (btn.dataset.kind === 'division') {
+    // clicking the open division closes it and goes back home
+    browseCategory = '';
+    browseDivision = browseDivision === value ? '' : value;
+  } else {
+    browseCategory = browseCategory === value ? '' : value;
+  }
+  runBrowse();
+});
+
+/* ---------- example searches ---------- */
+
+function renderExamples() {
+  const picks = ['claims', 'ESG', 'portfolio', 'broker', 'profitability', 'forecasting'];
+  examplesEl.innerHTML =
+    '<span class="examples-label">Try</span>' +
+    picks.map((p) => `<button type="button" class="chip chip-ghost">${escapeHtml(p)}</button>`).join('');
+}
+
+examplesEl.addEventListener('click', (e) => {
   const chip = e.target instanceof Element ? e.target.closest('.chip') : null;
   if (!chip) return;
   input.value = chip.textContent || '';
   runSearch(input.value);
+});
+
+/* ---------- starred dashboards ---------- */
+
+const STAR_KEY = 'dashboardSearch.starred';
+
+function loadStars() {
+  try {
+    const raw = localStorage.getItem(STAR_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    starred = new Set(Array.isArray(list) ? list.filter((x) => typeof x === 'string') : []);
+  } catch {
+    starred = new Set();   // unreadable or disabled storage - start empty
+  }
+}
+
+function saveStars() {
+  try {
+    localStorage.setItem(STAR_KEY, JSON.stringify([...starred]));
+  } catch {
+    /* private mode or a full quota: stars still work, they just do not persist */
+  }
+}
+
+/** @param {string} id */
+function toggleStar(id) {
+  if (starred.has(id)) starred.delete(id);
+  else starred.add(id);
+  saveStars();
+  renderStarred();
+  syncStarButtons();
+}
+
+/** Keep every star button on the page matching the stored set. */
+function syncStarButtons() {
+  for (const btn of document.querySelectorAll('.star-btn')) {
+    if (!(btn instanceof HTMLElement) || !btn.dataset.id) continue;
+    const on = starred.has(btn.dataset.id);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.setAttribute('aria-label', (on ? 'Unstar ' : 'Star ') + (btn.dataset.name || ''));
+  }
+}
+
+/** @param {Dashboard} item @returns {string} html */
+function starButton(item) {
+  const on = starred.has(item.id);
+  return `<button type="button" class="star-btn" data-id="${escapeHtml(item.id)}" data-name="${escapeHtml(item.name)}"
+    aria-pressed="${on}" aria-label="${on ? 'Unstar ' : 'Star '}${escapeHtml(item.name)}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.7l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.8z"/></svg>
+  </button>`;
+}
+
+/** The home grid. Starred ids no longer present in data.json are skipped. */
+function renderStarred() {
+  const items = ITEMS.filter((i) => starred.has(i.id)).sort((a, b) => a.name.localeCompare(b.name));
+  starredEl.hidden = items.length === 0;
+  starredCount.textContent = items.length ? String(items.length) : '';
+  starGrid.innerHTML = items.map(starCard).join('');
+}
+
+/** @param {Dashboard} item @returns {string} html */
+function starCard(item) {
+  const href = safeUrl(item.hyperlink);
+  const name = escapeHtml(item.name);
+  return `
+  <div class="star-card">
+    <div class="sc-crumbs"><span class="div">${escapeHtml(item.division)}</span><span class="sep">/</span>${escapeHtml(item.category)}</div>
+    <h3>${href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${name}</a>` : name}</h3>
+    <span class="sc-status ${escapeHtml(item.status)}">${escapeHtml(STATUS_LABEL[item.status] || item.status)}</span>
+    ${starButton(item)}
+  </div>`;
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target instanceof Element ? e.target.closest('.star-btn') : null;
+  if (!(btn instanceof HTMLElement) || !btn.dataset.id) return;
+  e.preventDefault();   // the row and the card are both covered by a link overlay
+  toggleStar(btn.dataset.id);
 });
 
 form.addEventListener('submit', (e) => {
@@ -521,6 +743,7 @@ input.addEventListener('keydown', (e) => {
   } else if (e.key === 'Escape') {
     if (!suggestBox.hidden) hideSuggestions();
     else if (input.value) { input.value = ''; clearBtn.hidden = true; goHome(); }
+    else if (browseDivision) goHome();
   }
 });
 

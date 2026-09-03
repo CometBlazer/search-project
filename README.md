@@ -2,8 +2,10 @@
 
 A single-page search over a catalogue of dashboards. Type a query, get ranked
 results with the matched terms highlighted, and narrow them down by division or
-status. Everything runs in the browser: there is no backend, no build step and
-no dependencies.
+status. You can also browse the catalogue by division and category from the
+chips under the search box, and star the dashboards you use so they sit in a
+grid on the home screen. Everything runs in the browser: there is no backend, no
+build step and no dependencies.
 
 ---
 
@@ -29,7 +31,7 @@ Or open the folder in VS Code and use the **Live Server** extension.
 |---|---|
 | `index.html` | Page skeleton. Two states - home and results - switched by a class on `<body>`. |
 | `styles.css` | All styling, including the light/dark palettes. No framework. |
-| `app.js` | Loading, searching, ranking, rendering, filters, suggestions. ~560 lines. |
+| `app.js` | Loading, searching, ranking, rendering, browse, filters, suggestions, stars. ~780 lines. |
 | `data.json` | The catalogue. The only file you edit to change what is searchable. |
 | `serve.js` | Local preview server. Development only - **never deployed**. |
 | `jsconfig.json` | Turns on editor type-checking for `app.js`. Editor only - **never deployed**. |
@@ -72,9 +74,9 @@ used for fast rejection while scoring.
 value as the label.
 
 **To change what is searchable, edit `data.json` and reload.** Adding a
-dashboard, a category or a whole division needs no code change - the divisions
-listed in the filter bar and the count on the home screen are both derived from
-the data at runtime.
+dashboard, a category or a whole division needs no code change - the browse
+chips, the filter bar and the count on the home screen are all derived from the
+data at runtime.
 
 ### 2. Ranking
 
@@ -126,25 +128,65 @@ the whole catalogue, so counts always add up to what you are looking at. Togglin
 one re-renders the list without re-running the search. Filters that no longer
 apply are dropped automatically when a new query narrows things.
 
-### 6. Suggestions
+### 6. Browse chips
+
+Under the search box is a chip strip built from the data by `buildTaxonomy()`:
+one chip per division with its dashboard count, ordered largest first. Clicking
+one opens it - `runBrowse()` lists every dashboard in that division, sorted by
+name, with no query and so no scoring or highlighting - and a second row of
+chips appears underneath with the categories inside it. Clicking a category
+narrows the list further; clicking either chip again turns it off, and turning
+the division off goes back home.
+
+The strip stays on screen while browsing, so the taxonomy is always one click
+away. It hides during a text search, which has its own filter row. While
+browsing, the division filter is left out of that row - the division is already
+fixed by the chip - so only the status filter renders.
+
+A third, quieter row holds a handful of example queries. Those are plain
+searches, not filters.
+
+### 7. Starred dashboards
+
+Any result row or starred card carries a star button. Starring writes the
+dashboard's `id` into a `Set` that is mirrored to `localStorage` under
+`dashboardSearch.starred` as a JSON array of ids, and the home screen shows the
+starred dashboards as a grid of cards beneath the search box.
+
+- **Ids only.** Names, links and descriptions are re-read from `data.json` on
+  every load, so edits to the catalogue show up in the grid immediately, and a
+  starred id that no longer exists is skipped rather than rendered stale.
+- **Every copy stays in sync.** `syncStarButtons()` updates the button on the
+  result row and the one on the card together, so starring from either place
+  looks the same everywhere.
+- **Storage can fail.** Private windows and full quotas make `localStorage`
+  throw; both the read and the write are wrapped, so stars still work for the
+  session and simply do not persist.
+
+Stars live in one browser on one machine. There is no account and nothing is
+sent anywhere - see [Known limitations](#known-limitations).
+
+### 8. Suggestions
 
 The dropdown offers matching categories and divisions first, then dashboard
 names, capped at 8 and drawn from the top 12 hits (cached per query). Arrow keys
 move through it, Enter accepts the highlighted one, Escape closes it, and a
 click outside dismisses it.
 
-### 7. URL and keyboard
+### 9. URL and keyboard
 
 The current query is mirrored into the URL as `?q=...` via `replaceState`, so a
 search is linkable and survives a refresh. Loading a URL with `?q=` runs that
-search immediately.
+search immediately. Browsing is mirrored the same way as
+`?division=...&category=...`, so a division or a category is linkable too;
+either parameter is ignored if it is not in the current data.
 
 | Key | Action |
 |---|---|
 | `/` | Focus the search field from anywhere |
 | Up / Down | Move through suggestions |
 | Enter | Search, accepting a highlighted suggestion |
-| Escape | Close suggestions, or clear the query and go home |
+| Escape | Close suggestions, then clear the query or leave a browse view |
 
 Typing searches live, debounced at 120 ms.
 
@@ -228,8 +270,9 @@ outside the VPN.
 
 ## Security
 
-There is no backend, no cookies, no storage and no accounts, so the usual
-server-side attack surface does not exist. The one real risk is rendering
+There is no backend, no cookies and no accounts, and the only storage is a list
+of starred ids in `localStorage`, so the usual server-side attack surface does
+not exist. The one real risk is rendering
 `data.json` into HTML, which is handled as follows:
 
 - **Everything interpolated into HTML is escaped** by `escapeHtml()`, including
@@ -240,6 +283,9 @@ server-side attack surface does not exist. The one real risk is rendering
 - **Query terms are regex-escaped** before being compiled into the highlighting
   pattern.
 - **External links** carry `target="_blank" rel="noopener noreferrer"`.
+- **Stored stars are ids, never markup.** They are read back as a JSON array,
+  filtered to strings, and only ever used to look up records that came from
+  `data.json`, so tampering with the stored value cannot inject anything.
 - **No third-party requests.** Fonts are the system stack; no CDN, no analytics,
   nothing phones home. Worth keeping that way.
 
@@ -303,7 +349,11 @@ a few things are shared so they still read as one product:
   docking into the top bar just drops its shadow and its Search button and
   shrinks it from 54px to 42px.
 - **One column.** Both states use a 680px column, so the docked search field
-  lines up exactly with the result text beneath it.
+  lines up exactly with the result text beneath it - chips and the starred grid
+  included.
+- **One chip.** Divisions, categories and the example queries are the same
+  component at three weights: outlined, filled-soft and ghost. The open division
+  is the only solid accent object on the screen.
 - **Results stay quiet:** hairline rows rather than cards, plain-text filters,
   a small status dot, and matches marked with weight and a faint tint rather
   than a highlighter.
@@ -318,3 +368,6 @@ a few things are shared so they still read as one product:
   reaches tens of thousands, this needs a real index or a server.
 - Sorting is by relevance only - there is no alphabetical or by-division sort.
 - No pagination; every match renders at once.
+- Stars are per browser and per device: they live in `localStorage`, so they do
+  not follow a user to another machine, and clearing site data removes them.
+  Sharing a list of favourites would need an account and a backend.
