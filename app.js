@@ -417,15 +417,29 @@ function renderResults(query) {
   }
 }
 
+/**
+ * A title marked as an outbound link. The arrow is glued to the last word so
+ * a wrapping title can never leave it stranded on a line of its own; the only
+ * spaces in `html` are real ones, `highlight` adds no space inside its tags.
+ * @param {string} html a title, already escaped and possibly marked up
+ * @returns {string} html
+ */
+function withArrow(html) {
+  const i = html.lastIndexOf(' ');
+  const last = html.slice(i + 1);
+  return html.slice(0, i + 1) +
+    `<span class="nb">${last}<span class="ext" aria-hidden="true"></span></span>`;
+}
+
 /** @param {Dashboard} item @param {string[]} tokens @returns {string} html */
 function card(item, tokens) {
   const href = linkFor(item);
   const host = safeHost(href);
   const title = highlight(item.name, tokens);
   return `
-  <li class="row">
+  <li class="row${href ? '' : ' is-soon'}">
     <div class="crumbs"><span class="div">${highlight(item.division, tokens)}</span><span class="sep">/</span>${highlight(item.category, tokens)}</div>
-    <h3>${href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${title}</a>` : title}</h3>
+    <h3>${href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${withArrow(title)}</a>` : title}</h3>
     <p>${highlight(item.description, tokens)}</p>
     <div class="row-meta">
       <span class="status ${escapeHtml(item.status)}">${escapeHtml(STATUS_LABEL[item.status] || item.status)}</span>
@@ -761,9 +775,9 @@ function starCard(item) {
   const href = linkFor(item);
   const name = escapeHtml(item.name);
   return `
-  <div class="star-card">
+  <div class="star-card${href ? '' : ' is-soon'}">
     <div class="sc-crumbs"><span class="div">${escapeHtml(item.division)}</span><span class="sep">/</span>${escapeHtml(item.category)}</div>
-    <h3>${href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${name}</a>` : name}</h3>
+    <h3>${href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${withArrow(name)}</a>` : name}</h3>
     <span class="sc-status ${escapeHtml(item.status)}">${escapeHtml(STATUS_LABEL[item.status] || item.status)}</span>
     ${starButton(item)}
   </div>`;
