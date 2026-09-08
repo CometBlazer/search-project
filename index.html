@@ -54,6 +54,7 @@
       <div class="filters" id="filters">
         <div class="filter-group" id="divisionFilters" role="group" aria-label="Filter by division"></div>
         <div class="filter-group" id="statusFilters" role="group" aria-label="Filter by status"></div>
+        <div class="filter-group" id="qualityFilters" role="group" aria-label="Filter by freshness"></div>
       </div>
     </div>
     <ol class="results" id="results"></ol>
@@ -64,6 +65,8 @@
   </section>
 </main>
 
+<!-- matching and ranking; must load before app.js, which calls into it -->
+<script src="search.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

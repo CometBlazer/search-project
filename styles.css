@@ -18,6 +18,8 @@
   --shadow: 0 1px 2px rgba(16, 16, 18, .05), 0 10px 26px -12px rgba(16, 16, 18, .28);
   --col: 680px;
   --link-line: rgba(51, 80, 217, .32);
+  --warn: #9a6a1e;
+  --bad: #a2483c;
   --ext-arrow: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.3 8.7 8.7 3.3'/%3E%3Cpath d='M4.6 3.3h4.1v4.1'/%3E%3C/svg%3E");
 }
 @media (prefers-color-scheme: dark) {
@@ -39,6 +41,8 @@
     --ring: rgba(143, 166, 255, .16);
     --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 30px -14px rgba(0, 0, 0, .8);
     --link-line: rgba(143, 166, 255, .36);
+    --warn: #d3a55f;
+    --bad: #e08579;
   }
 }
 
@@ -451,6 +455,33 @@ h3 .ext {
 .status.coming_soon { color: var(--soon); }
 .row-id { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
 .row-host { margin-left: auto; }
+
+/* Why a result matched, when the title does not make it obvious. On harvested
+   data most matches land in a column or a measure rather than the name, so this
+   line is doing the work the description would do in a curated catalogue. */
+.why {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.45;
+}
+.why i {
+  font-style: normal;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.8px;
+  color: var(--text-2);
+}
+
+.fresh.warn { color: var(--warn); }
+.fresh.bad { color: var(--bad); }
+.views.none { opacity: .62; }
+.deadwood { color: var(--bad); }
+
+/* Dead weight stays visible and stays readable - it is still a real report, and
+   the one time someone wants the 2019 copy they need to be able to find it.
+   Muted enough that a live result next to it wins the eye, and no more. */
+.row.is-deadwood { opacity: .62; }
+.row.is-deadwood:hover, .row.is-deadwood:focus-within { opacity: 1; }
 
 mark {
   background: var(--accent-tint);
